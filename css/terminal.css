@@ -1,0 +1,278 @@
+.term {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  line-height: 1.65;
+  letter-spacing: 0;
+
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.term-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.term-dots {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.term-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+}
+
+.term-path {
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.term-bar::after {
+  content: "";
+  width: 2.8rem;
+}
+
+.term-head {
+  padding: 0.85rem 0.85rem 0.6rem;
+}
+
+.term-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.term-item {
+  display: grid;
+  grid-template-columns: 1.2rem 1.9rem 1fr auto;
+  gap: 0.6rem;
+  align-items: baseline;
+  width: 100%;
+  text-align: left;
+
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--muted);
+
+  background: none;
+  border: none;
+  border-left: 2px solid transparent;
+  padding: 0.22rem 0.5rem;
+  cursor: pointer;
+}
+
+.term-item:hover:not([aria-current="true"]) {
+  color: var(--ink);
+  border-left-color: var(--rule);
+}
+
+.term-item[aria-current="true"] {
+  color: var(--paper);
+  background: var(--ink);
+  border-left-color: var(--ink);
+}
+
+.term-caret {
+  visibility: hidden;
+}
+
+.term-item[aria-current="true"] .term-caret {
+  visibility: visible;
+}
+
+.term-num {
+  font-variant-numeric: tabular-nums;
+}
+
+.term-file {
+  color: var(--ink);
+}
+
+.term-item[aria-current="true"] .term-file {
+  color: var(--paper);
+}
+
+.term-label {
+  font-size: 0.72rem;
+  opacity: 0.75;
+}
+
+.term-output {
+  min-height: min(13rem, 26vh);
+  max-height: min(26rem, 46vh);
+  overflow-y: auto;
+  border-top: 1px solid var(--rule);
+  transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .term-output {
+    transition: none;
+  }
+}
+
+.term-inner {
+  padding: 0.6rem 0.85rem 0.85rem;
+}
+
+.term-block {
+  margin-bottom: 0.85rem;
+}
+
+.term-block > summary {
+  color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+}
+
+.term-block > summary::-webkit-details-marker {
+  display: none;
+}
+
+.term-block > summary::before {
+  content: "▾ ";
+}
+
+.term-block:not([open]) > summary::before {
+  content: "▸ ";
+}
+
+.term-block > summary:hover {
+  color: var(--ink);
+}
+
+.term-body {
+  padding: 0.35rem 0 0 1.1rem;
+  border-left: 1px solid var(--rule);
+  margin-left: 0.25rem;
+}
+
+.term-body p {
+  margin: 0 0 0.25rem;
+}
+
+.term-title {
+  color: var(--ink);
+}
+
+.term-table {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.15rem 1.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.term-dim {
+  color: var(--muted);
+}
+
+.term-body a {
+  border-bottom-color: var(--muted);
+}
+
+.term-form {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+}
+
+.term-ps1 {
+  color: var(--muted);
+}
+
+.term-input {
+  flex: 1;
+  min-width: 0;
+
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--ink);
+
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.term-input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.term-input:focus {
+  outline: none;
+}
+
+.term-hint {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0;
+
+  margin: 0;
+  padding: 0.5rem 0.85rem;
+  border-top: 1px solid var(--rule);
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.2rem 1rem;
+}
+
+.term-hint-more {
+  margin-left: auto;
+}
+
+.term-hint-more a {
+  color: inherit;
+}
+
+.term-hint-touch {
+  display: none;
+}
+
+@media (max-width: 40rem) {
+  .term-item {
+    grid-template-columns: 1.2rem 1.9rem 1fr;
+    row-gap: 0;
+  }
+
+  .term-label {
+    grid-column: 3;
+  }
+
+  .term-output {
+    min-height: min(8rem, 18vh);
+    max-height: min(16rem, 34vh);
+  }
+
+  .term-form {
+    display: none;
+  }
+
+  .term-hint-keys {
+    display: none;
+  }
+
+  .term-hint-touch {
+    display: inline;
+  }
+
+  .term-output {
+    display: none;
+  }
+
+  .term.has-output .term-output {
+    display: block;
+  }
+}
