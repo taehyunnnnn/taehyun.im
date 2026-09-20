@@ -1,0 +1,22 @@
+# 4K source gradients, 17-20MB each. The site only ever needs the
+# resized copies. ** matches any depth.
+assets/**/*.png
+
+# Working notes, local only.
+*.md
+
+# Local editor and tool state. Any hidden directory, none of which
+# belong to the site itself.
+.*/
+!.github/
+
+# Screenshots taken while checking a change.
+*-check.png
+
+# macOS
+.DS_Store
+
+# extra
+CLAUDE.md
+.claude/
+.mcp.json
