@@ -254,6 +254,7 @@
   .term-output {
     min-height: min(8rem, 18vh);
     max-height: min(16rem, 34vh);
+    display: none;
   }
 
   .term-form {
@@ -266,10 +267,6 @@
 
   .term-hint-touch {
     display: inline;
-  }
-
-  .term-output {
-    display: none;
   }
 
   .term.has-output .term-output {

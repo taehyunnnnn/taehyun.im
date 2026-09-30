@@ -1,0 +1,89 @@
+.nav {
+  margin-top: auto;
+
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  gap: 0.75rem;
+
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.nav a:first-child,
+.navbar a:first-child {
+  justify-self: start;
+}
+
+.nav a:last-child,
+.navbar a:last-child {
+  justify-self: end;
+}
+
+.nav a {
+  border-bottom: 1px solid transparent;
+}
+
+.nav a:hover {
+  border-bottom-color: var(--ink);
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+
+  background: var(--ink);
+  color: var(--paper);
+
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+
+  transform: translateY(-100%);
+  visibility: hidden;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.28s;
+}
+
+.navbar.is-visible {
+  transform: translateY(0);
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar {
+    transition: none;
+  }
+}
+
+.navbar-inner {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0.55rem var(--gutter);
+
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.navbar a {
+  border-bottom: none;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.navbar a:hover {
+  opacity: 1;
+}
+
+@media (max-width: 40rem) {
+  .nav {
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    gap: 0.5rem;
+  }
+}
