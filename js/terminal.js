@@ -1,79 +1,71 @@
-(function () {
+(() => {
   "use strict";
 
-  var mount = document.querySelector("[data-terminal]");
+  const mount = document.querySelector("[data-terminal]");
   if (!mount) return;
 
-  var sourceList = mount.querySelector(".projects");
+  const sourceList = mount.querySelector(".projects");
   if (!sourceList) return;
 
-  var PATH = "taehyunim/projects";
-  var MARK = "❯";
+  const PATH = "taehyunim/projects";
+  const MARK = "❯";
 
   function el(tag, className, textContent) {
-    var node = document.createElement(tag);
+    const node = document.createElement(tag);
     if (className) node.className = className;
     if (textContent) node.textContent = textContent;
     return node;
   }
 
   function textOf(root, selector) {
-    var found = root.querySelector(selector);
+    const found = root.querySelector(selector);
     return found ? found.textContent.trim() : "";
   }
 
-  var projects = Array.prototype.map.call(
-    sourceList.querySelectorAll(".project"),
-    function (li) {
-      var title = textOf(li, ".project-title");
-      var link = li.querySelector(".project-link");
-      var lang = textOf(li, ".project-meta").toLowerCase();
+  const projects = [...sourceList.querySelectorAll(".project")].map((li) => {
+    const title = textOf(li, ".project-title");
+    const link = li.querySelector(".project-link");
 
-      return {
-        num: textOf(li, ".project-index"),
-        title: title,
-
-        slug: title
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/(^-|-$)/g, ""),
-        desc: textOf(li, ".project-desc"),
-        lang: lang,
-        href: link ? link.getAttribute("href") : ""
-      };
-    }
-  );
+    return {
+      num: textOf(li, ".project-index"),
+      title,
+      slug: title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, ""),
+      desc: textOf(li, ".project-desc"),
+      lang: textOf(li, ".project-meta").toLowerCase(),
+      href: link ? link.getAttribute("href") : ""
+    };
+  });
 
   if (!projects.length) return;
 
-  var selected = 0;
+  let selected = 0;
 
-  var term = el("div", "term");
+  const term = el("div", "term");
 
-  var bar = el("div", "term-bar");
-  var dots = el("div", "term-dots");
+  const bar = el("div", "term-bar");
+  const dots = el("div", "term-dots");
   dots.setAttribute("aria-hidden", "true");
-  for (var d = 0; d < 3; d++) dots.appendChild(el("span", "term-dot"));
+  for (let d = 0; d < 3; d++) dots.appendChild(el("span", "term-dot"));
   bar.appendChild(dots);
   bar.appendChild(el("span", "term-path", PATH));
 
-  var head = el("div", "term-head");
+  const head = el("div", "term-head");
+  const list = el("ul", "term-list");
 
-  var list = el("ul", "term-list");
-
-  var buttons = projects.map(function (project, i) {
-    var row = el("li");
-    var button = el("button", "term-item");
+  const buttons = projects.map((project, i) => {
+    const row = el("li");
+    const button = el("button", "term-item");
     button.type = "button";
 
     button.appendChild(el("span", "term-caret", MARK));
     button.appendChild(el("span", "term-num", project.num));
-    button.appendChild(
-      el("span", "term-file", project.slug + "." + project.lang)
-    );
+    button.appendChild(el("span", "term-file", `${project.slug}.${project.lang}`));
     button.appendChild(el("span", "term-label", project.title));
 
-    button.addEventListener("click", function () {
+    button.addEventListener("click", () => {
       selected = i;
       draw();
       open(i);
@@ -86,17 +78,16 @@
 
   head.appendChild(list);
 
-  var output = el("div", "term-output");
-  var inner = el("div", "term-inner");
-  var log = el("div");
-
+  const output = el("div", "term-output");
+  const inner = el("div", "term-inner");
+  const log = el("div");
   log.setAttribute("aria-live", "polite");
 
-  var form = el("form", "term-form");
-  var promptMark = el("label", "term-ps1", MARK);
+  const form = el("form", "term-form");
+  const promptMark = el("label", "term-ps1", MARK);
   promptMark.setAttribute("for", "term-input");
 
-  var input = el("input", "term-input");
+  const input = el("input", "term-input");
   input.id = "term-input";
   input.type = "text";
   input.autocomplete = "off";
@@ -110,17 +101,16 @@
   inner.appendChild(form);
   output.appendChild(inner);
 
-  var hint = el("p", "term-hint");
-  hint.appendChild(
-    el("span", "term-hint-keys", "↑↓ select · tab complete · enter open · type help")
-  );
+  const hint = el("p", "term-hint");
+  hint.appendChild(el("span", "term-hint-keys", "↑↓ select · enter open · type help"));
   hint.appendChild(el("span", "term-hint-touch", "tap a project to open it"));
 
-  var aside = mount.parentNode && mount.parentNode.querySelector(".aside");
+  // The "More at github" line moves into the terminal's footer.
+  const aside = mount.parentNode.querySelector(".aside");
   if (aside) {
-    var more = el("span", "term-hint-more");
-    while (aside.firstChild) more.appendChild(aside.firstChild);
-    aside.parentNode.removeChild(aside);
+    const more = el("span", "term-hint-more");
+    more.append(...aside.childNodes);
+    aside.remove();
     hint.appendChild(more);
   }
 
@@ -132,113 +122,82 @@
   sourceList.hidden = true;
   mount.appendChild(term);
 
-  var MIN = parseFloat(window.getComputedStyle(output).minHeight) || 0;
-  var MAX = parseFloat(window.getComputedStyle(output).maxHeight) || Infinity;
+  const MIN = parseFloat(getComputedStyle(output).minHeight) || 0;
+  const MAX = parseFloat(getComputedStyle(output).maxHeight) || Infinity;
 
   function fit() {
-    var wanted = inner.offsetHeight;
-    output.style.height = Math.max(MIN, Math.min(wanted, MAX)) + "px";
+    output.style.height = Math.max(MIN, Math.min(inner.offsetHeight, MAX)) + "px";
   }
 
   function draw() {
-    buttons.forEach(function (button, i) {
+    buttons.forEach((button, i) => {
       button.setAttribute("aria-current", i === selected ? "true" : "false");
     });
   }
 
   function print(command, lines) {
-    var block;
+    const block = el("details", "term-block");
+    block.open = true;
+    block.appendChild(el("summary", null, command));
+    block.addEventListener("toggle", fit);
 
-    if (command) {
-      block = el("details", "term-block");
-      block.open = true;
-      block.appendChild(el("summary", null, command));
-
-      block.addEventListener("toggle", fit);
-    } else {
-      block = el("div", "term-block");
-    }
-
-    var body = el("div", "term-body");
-    (lines || []).forEach(function (line) {
-      body.appendChild(line);
-    });
+    const body = el("div", "term-body");
+    body.append(...lines);
     block.appendChild(body);
 
     log.appendChild(block);
-    settle();
-  }
-
-  function settle() {
     term.classList.add("has-output");
     fit();
     output.scrollTop = output.scrollHeight;
   }
 
-  function table() {
-    return el("div", "term-table");
-  }
-
-  function row(into, label, value) {
-    into.appendChild(el("span", null, label));
-    into.appendChild(el("span", "term-dim", value || ""));
-  }
-
   function open(i, echo) {
-    var project = projects[i];
+    const project = projects[i];
 
-    var link = el("a", null, project.href.replace(/^https?:\/\//, ""));
+    const link = el("a", null, project.href.replace(/^https?:\/\//, ""));
     link.href = project.href;
     link.target = "_blank";
 
-    var linkLine = el("p");
-    linkLine.appendChild(document.createTextNode("→ "));
-    linkLine.appendChild(link);
+    const linkLine = el("p");
+    linkLine.append("→ ", link);
 
-    print(echo || "open " + project.num, [
+    print(echo || `open ${project.num}`, [
       el("p", "term-title", project.title),
       el("p", null, project.desc),
       linkLine
     ]);
   }
 
-  var COMMANDS = [
-    { name: "open", args: "<number>", help: "show one, with its link" },
-    { name: "help", args: "", help: "this" },
-    { name: "clear", args: "", help: "empty the screen" }
+  const COMMANDS = [
+    { usage: "open <number>", help: "show one, with its link" },
+    { usage: "help", help: "this" },
+    { usage: "clear", help: "empty the screen" }
   ];
 
-  var NAMES = COMMANDS.map(function (c) {
-    return c.name;
-  });
-
+  // Accepts "01", "1", "tic-tac-toe" or "tic-tac-toe.java".
   function find(argument) {
-    for (var i = 0; i < projects.length; i++) {
-      if (projects[i].num === argument) return i;
-      if (projects[i].slug === argument) return i;
-      if (projects[i].slug + "." + projects[i].lang === argument) return i;
-      if (String(i + 1) === argument) return i;
-    }
-    return -1;
+    return projects.findIndex(
+      (p, i) =>
+        p.num === argument ||
+        p.slug === argument ||
+        `${p.slug}.${p.lang}` === argument ||
+        String(i + 1) === argument
+    );
   }
 
   function run(raw) {
-    var line = raw.trim();
-    var parts = line.split(/\s+/);
-    var command = (parts[0] || "").toLowerCase();
-    var argument = (parts[1] || "").toLowerCase();
+    const line = raw.trim();
+    const [command = "", argument = ""] = line.toLowerCase().split(/\s+/);
 
     if (!command) {
       open(selected);
       return;
     }
 
-    if (command === "open" || command === "cat") {
-      var i = find(argument);
+    if (command === "open") {
+      const i = find(argument);
       if (i === -1) {
-        print(line, [
-          el("p", null, "no such project: " + (argument || "(nothing given)"))
-        ]);
+        print(line, [el("p", null, `no such project: ${argument || "(nothing given)"}`)]);
         return;
       }
       selected = i;
@@ -248,14 +207,12 @@
     }
 
     if (command === "help") {
-      var grid = table();
-      COMMANDS.forEach(function (c) {
-        row(grid, c.name + (c.args ? " " + c.args : ""), c.help);
+      const grid = el("div", "term-table");
+      COMMANDS.forEach((c) => {
+        grid.appendChild(el("span", null, c.usage));
+        grid.appendChild(el("span", "term-dim", c.help));
       });
-      print(line, [
-        grid,
-        el("p", "term-dim", "tab completes · ↑ ↓ enter do the same by hand")
-      ]);
+      print(line, [grid, el("p", "term-dim", "↑ ↓ and enter do the same by hand")]);
       return;
     }
 
@@ -266,170 +223,59 @@
       return;
     }
 
-    var guess = nearest(command);
     print(line, [
-      el("p", null, command + ": command not found."),
-      el(
-        "p",
-        "term-dim",
-        guess ? "did you mean `" + guess + "`?" : "try `help`."
-      )
+      el("p", null, `${command}: command not found.`),
+      el("p", "term-dim", "try `help`.")
     ]);
   }
 
-  function distance(a, b) {
-    var prev = [];
-    var curr = [];
-    var i, j;
+  /* Arrow keys only move the selection while the projects section is
+     on screen, so they don't hijack scrolling anywhere else. "On screen"
+     means the section covers the middle of the window. */
+  const section = term.closest("section");
 
-    for (j = 0; j <= b.length; j++) prev[j] = j;
-
-    for (i = 1; i <= a.length; i++) {
-      curr[0] = i;
-      for (j = 1; j <= b.length; j++) {
-        curr[j] = Math.min(
-          prev[j] + 1,
-          curr[j - 1] + 1,
-          prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
-        );
-      }
-      prev = curr.slice();
-    }
-
-    return prev[b.length];
-  }
-
-  function nearest(word) {
-    var best = null;
-    var bestDistance = Infinity;
-
-    NAMES.forEach(function (name) {
-      var d = distance(word, name);
-      if (d < bestDistance) {
-        bestDistance = d;
-        best = name;
-      }
-    });
-
-    return bestDistance <= Math.max(2, Math.floor(word.length / 3))
-      ? best
-      : null;
-  }
-
-  /* -------------------------------------------------------------
-     Tab completion
-     Completes the word being typed: command names in the first
-     position, project filenames after `open`. With one match it
-     finishes the word; with several it fills in as far as they agree
-     and lists them, the way a shell does.
-     ------------------------------------------------------------- */
-  function complete() {
-    var parts = input.value.split(/\s+/);
-    var token = parts[parts.length - 1].toLowerCase();
-    var pool;
-
-    if (parts.length === 1) {
-      pool = NAMES;
-    } else if (parts[0].toLowerCase() === "open" || parts[0].toLowerCase() === "cat") {
-      pool = projects.map(function (p) {
-        return p.slug + "." + p.lang;
-      });
-    } else {
-      return false;
-    }
-
-    var matches = pool.filter(function (candidate) {
-      return candidate.indexOf(token) === 0;
-    });
-
-    if (!matches.length) return false;
-
-    /* The longest prefix every match agrees on. With one match that is
-       the whole word, which is why this handles both cases. */
-    var shared = matches.reduce(function (a, b) {
-      var i = 0;
-      while (i < a.length && i < b.length && a[i] === b[i]) i++;
-      return a.slice(0, i);
-    });
-
-    if (matches.length > 1) {
-      print(
-        input.value,
-        matches.map(function (m) {
-          return el("p", null, m);
-        })
-      );
-    }
-
-    parts[parts.length - 1] = shared;
-    input.value = parts.join(" ") + (matches.length === 1 ? " " : "");
-    return true;
-  }
-
-  /* -------------------------------------------------------------
-     6. KEYBOARD AND MOUSE
-     ------------------------------------------------------------- */
-
-  /* Whether the projects section is the thing being looked at, rather
-     than something scrolled halfway off. The test is the middle of the
-     window: if the section's box straddles it, the section has the
-     screen. Measured per keypress rather than watched, because a
-     rectangle read on demand can't go stale. */
-  var section = term.closest("section") || document.getElementById("projects");
-
-  function sectionHoldsTheScreen() {
-    if (!section) return false;
-    var box = section.getBoundingClientRect();
-    var middle = window.innerHeight / 2;
+  function sectionIsOnScreen() {
+    const box = section.getBoundingClientRect();
+    const middle = window.innerHeight / 2;
     return box.top <= middle && box.bottom >= middle;
   }
 
-  document.addEventListener("keydown", function (event) {
+  document.addEventListener("keydown", (event) => {
     if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
-
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     if (event.defaultPrevented) return;
 
-    var focused = term.contains(document.activeElement);
-    if (!focused && !sectionHoldsTheScreen()) return;
+    const focused = term.contains(document.activeElement);
+    if (!focused && !sectionIsOnScreen()) return;
 
     event.preventDefault();
-    selected =
-      event.key === "ArrowUp"
-        ? (selected - 1 + projects.length) % projects.length
-        : (selected + 1) % projects.length;
-
+    const step = event.key === "ArrowUp" ? -1 : 1;
+    selected = (selected + step + projects.length) % projects.length;
     draw();
 
-    if (
-      document.activeElement &&
-      document.activeElement.classList.contains("term-item")
-    ) {
+    // preventScroll: a plain focus() scrolls every ancestor, which
+    // jumped the page by thousands of pixels.
+    if (document.activeElement.classList.contains("term-item")) {
       buttons[selected].focus({ preventScroll: true });
     }
   });
 
-  form.addEventListener("submit", function (event) {
+  form.addEventListener("submit", (event) => {
     event.preventDefault();
     run(input.value);
     input.value = "";
   });
 
-  input.addEventListener("keydown", function (event) {
-    if (event.key !== "Tab" || event.shiftKey) return;
-    if (!input.value.trim()) return;
-    if (complete()) event.preventDefault();
-  });
+  // Clicking empty space in the terminal puts the cursor in the prompt,
+  // but only with a mouse: on a phone it would pop up the keyboard.
+  const hasMouse = matchMedia("(pointer: fine)").matches;
 
-  var hasMouse = window.matchMedia("(pointer: fine)").matches;
-
-  term.addEventListener("click", function (event) {
+  term.addEventListener("click", (event) => {
     if (!hasMouse) return;
     if (event.target.closest("button, a, summary")) return;
     input.focus({ preventScroll: true });
   });
 
   draw();
-
   fit();
 })();
